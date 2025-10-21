@@ -117,7 +117,7 @@ public class AdminDashboardUI extends JFrame implements ActionListener {
         }
     }
 
-    
+
     private void handleViewRegistrations() {
         int selectedRow = eventTable.getSelectedRow();
         if (selectedRow == -1) {

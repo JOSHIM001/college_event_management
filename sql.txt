@@ -1,0 +1,58 @@
+-- Create the database
+CREATE DATABASE IF NOT EXISTS college_event_db;
+USE college_event_db;
+
+-- 1. User Table (Base User Info)
+CREATE TABLE User (
+    userId INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    password VARCHAR(50) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    userType VARCHAR(20) NOT NULL -- 'Student' or 'Administrator'
+);
+
+-- 2. Administrator Table (Admin Details)
+CREATE TABLE Administrator (
+    adminId INT AUTO_INCREMENT PRIMARY KEY,
+    adminName VARCHAR(100) NOT NULL,
+    userId INT NOT NULL UNIQUE,
+    FOREIGN KEY (userId) REFERENCES User(userId) ON DELETE CASCADE
+);
+
+-- 3. Student Table (Student Details)
+CREATE TABLE Student (
+    studentId INT AUTO_INCREMENT PRIMARY KEY,
+    studentName VARCHAR(100) NOT NULL,
+    userId INT NOT NULL UNIQUE,
+    FOREIGN KEY (userId) REFERENCES User(userId) ON DELETE CASCADE
+);
+
+-- 4. Event Table (Events managed by Admin)
+CREATE TABLE Event (
+    eventId INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    eventDate DATE NOT NULL,
+    location VARCHAR(150),
+    adminId INT,
+    FOREIGN KEY (adminId) REFERENCES Administrator(adminId)
+);
+
+-- 5. Registration Table (Student Event Registrations)
+-- This table links students to events they have registered for.
+CREATE TABLE Registration (
+    registrationId INT AUTO_INCREMENT PRIMARY KEY,
+    studentId INT NOT NULL,
+    eventId INT NOT NULL,
+    registrationDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (studentId) REFERENCES Student(studentId) ON DELETE CASCADE,
+    FOREIGN KEY (eventId) REFERENCES Event(eventId) ON DELETE CASCADE,
+    -- Ensure a student can only register for the same event once
+    UNIQUE KEY unique_registration (studentId, eventId)
+);
+
+-- Insert a default Administrator (Optional, but recommended for initial testing)
+INSERT INTO User (username, password, email, userType) VALUES ('admin', 'admin123', 'admin@college.com', 'Administrator');
+INSERT INTO Administrator (adminName, userId) VALUES ('Super Admin', 1);
+
+-- Note: Remember to update DatabaseConnection.java with your actual MySQL credentials.
